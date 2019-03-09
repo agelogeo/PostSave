@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  tools:context=".MainActivity">
+
+  <ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <android.support.constraint.ConstraintLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
+
+      <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:orientation="horizontal">
+
+          <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:padding="5dp"
+            android:text="5"
+            android:textAllCaps="false"
+            android:textColor="@android:color/background_light"
+            android:textStyle="bold|italic" />
+
+          <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@android:drawable/ic_menu_save" />
+        </LinearLayout>
+
+      </FrameLayout>
+
+      <ImageView
+        android:id="@+id/logoImageView"
+        android:layout_width="198dp"
+        android:layout_height="189dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/ic_launcher" />
+
+      <EditText
+        android:id="@+id/urlText"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="8dp"
+        android:ems="10"
+        android:focusableInTouchMode="false"
+        android:inputType="textPersonName"
+        android:text="Place here your post url.."
+        app:layout_constraintEnd_toStartOf="@+id/pasteButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logoImageView" />
+
+      <Button
+        android:id="@+id/pasteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="8dp"
+        android:text="Paste"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logoImageView" />
+
+      <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/urlText">
+
+        <Button
+          android:id="@+id/showTheContentButton"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="Show The Content" />
+
+        <Button
+          android:id="@+id/myDownloadButton"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="My Download" />
+
+        <Button
+          android:id="@+id/instagramAppButton"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="Open Instagram App" />
+
+        <Button
+          android:id="@+id/helpButton"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="Help" />
+
+        <Button
+          android:id="@+id/button7"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="Watch an ad for extra lives" />
+
+        <Button
+          android:id="@+id/button6"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="0.69€ / Month (No Ads)" />
+      </LinearLayout>
+    </android.support.constraint.ConstraintLayout>
+  </ScrollView>
+
+</android.support.constraint.ConstraintLayout>
