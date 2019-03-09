@@ -101,13 +101,14 @@
           android:id="@+id/showTheContentButton"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="Show The Content" />
+          android:enabled="false"
+          android:text="Download" />
 
         <Button
           android:id="@+id/myDownloadButton"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="My Download" />
+          android:text="Media Library" />
 
         <Button
           android:id="@+id/instagramAppButton"
@@ -125,13 +126,13 @@
           android:id="@+id/button7"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="Watch an ad for extra lives" />
+          android:text="Watch an ad for extra saves" />
 
         <Button
           android:id="@+id/button6"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="0.69€ / Month (No Ads)" />
+          android:text="0.69€ / Month (Unlimited Saves)" />
       </LinearLayout>
     </android.support.constraint.ConstraintLayout>
   </ScrollView>
