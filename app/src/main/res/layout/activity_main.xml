@@ -9,7 +9,9 @@
 
   <ScrollView
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    tools:layout_editor_absoluteX="0dp"
+    tools:layout_editor_absoluteY="0dp">
 
     <android.support.constraint.ConstraintLayout
       android:layout_width="match_parent"
@@ -82,6 +84,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="8dp"
+        android:onClick="pasteButton"
         android:text="Paste"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/logoImageView" />
@@ -98,7 +101,7 @@
         app:layout_constraintTop_toBottomOf="@+id/urlText">
 
         <Button
-          android:id="@+id/showTheContentButton"
+          android:id="@+id/downloadButton"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:enabled="false"
