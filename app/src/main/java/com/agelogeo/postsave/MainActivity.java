@@ -114,6 +114,9 @@ public class MainActivity extends AppCompatActivity {
         JSONObject owner = first_graphql_shortcode_media.getJSONObject("owner");
         Log.i("USERNAME",owner.getString("username"));
 
+        ImageDownloader imageTask = new ImageDownloader();
+        imageTask.execute(owner.getString("profile_pic_url"));
+
 
         /*ImageDownloader imageTask = new ImageDownloader();
         Pattern p = Pattern.compile("<meta property=\"og:image\" content=\"(.*?)\"");
