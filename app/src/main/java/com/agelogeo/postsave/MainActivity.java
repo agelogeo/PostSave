@@ -16,6 +16,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -67,19 +71,25 @@ public class MainActivity extends AppCompatActivity {
         url = new URL(urls[0]);
         urlConnection = (HttpURLConnection) url.openConnection();
 
-        InputStream in = urlConnection.getInputStream();
-        InputStreamReader reader = new InputStreamReader(in);
+        //InputStream in = urlConnection.getInputStream();
+        //InputStreamReader reader = new InputStreamReader(in);
 
-        int data = reader.read();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+        String line = null;
+        while ((line = reader.readLine()) != null)
+        {
+          result += line;
+        }
+        /*int data = reader.read();
         int limit = 0;
-        while(data != -1 && limit<50000){
-          if(limit>40000){
+        while(data != -1 ){
+          if(limit > 80000){
             char current = (char) data;
             result += current;
             data = reader.read();
           }
           limit++;
-        }
+        }*/
         return result;
       }catch (Exception e){
         e.printStackTrace();
@@ -90,14 +100,29 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPostExecute(String s) {
       try{
-        ImageDownloader imageTask = new ImageDownloader();
+        Pattern p2 = Pattern.compile("window._sharedData = (.*?);");
+        //Log.i("TEXT",s);
+        Matcher m2 = p2.matcher(s);
+
+        m2.find();
+        String jObject = m2.group(1);
+        Log.i("MATCHER",jObject);
+        JSONObject jsonObject = new JSONObject(jObject);
+        JSONObject entry_data = jsonObject.getJSONObject("entry_data");
+        JSONArray PostPage = entry_data.getJSONArray("PostPage");
+        JSONObject first_graphql_shortcode_media = PostPage.getJSONObject(0).getJSONObject("graphql").getJSONObject("shortcode_media");
+        JSONObject owner = first_graphql_shortcode_media.getJSONObject("owner");
+        Log.i("USERNAME",owner.getString("username"));
+
+
+        /*ImageDownloader imageTask = new ImageDownloader();
         Pattern p = Pattern.compile("<meta property=\"og:image\" content=\"(.*?)\"");
         Log.i("TEXT",s);
         Matcher m = p.matcher(s);
 
         m.find();
         Log.i("MATCHER",m.group(1));
-        imageTask.execute(m.group(1));
+        imageTask.execute(m.group(1));*/
       }catch (Exception e){
         downloadButton.setEnabled(false);
         logoImageView.setImageResource(R.mipmap.ic_launcher_round);
