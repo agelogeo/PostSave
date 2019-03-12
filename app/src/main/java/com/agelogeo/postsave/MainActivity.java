@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
   GridView imageGrid;
   ArrayList<Bitmap> bitmapList;
 
-
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -91,13 +90,12 @@ public class MainActivity extends AppCompatActivity {
 
   public void analyzePost(String s){
     try{
-      Pattern p2 = Pattern.compile("window._sharedData = (.*?)[}];");
-      //Log.i("TEXT",s);
-      Matcher m2 = p2.matcher(s);
+      String link ;
+      Pattern pattern = Pattern.compile("window._sharedData = (.*?)[}];");
+      Matcher matcher = pattern.matcher(s);
 
-      m2.find();
-      String jObject = m2.group(1)+"}";
-      //Log.i("MATCHER",jObject);
+      matcher.find();
+      String jObject = matcher.group(1)+"}";
       JSONObject jsonObject = new JSONObject(jObject);
       JSONObject entry_data = jsonObject.getJSONObject("entry_data");
       JSONArray PostPage = entry_data.getJSONArray("PostPage");
@@ -107,14 +105,11 @@ public class MainActivity extends AppCompatActivity {
       Log.i("USERNAME",owner.getString("username"));
       Log.i("PROFILE_PIC_URL",owner.getString("profile_pic_url"));
 
-
-      String link ;
       if(first_graphql_shortcode_media.has("edge_sidecar_to_children")){
         JSONArray children_edges = first_graphql_shortcode_media.getJSONObject("edge_sidecar_to_children").getJSONArray("edges");
         Log.i("WITH_CHILDREN_COUNT",Integer.toString(children_edges.length()));
 
         for(int i=0; i<children_edges.length(); i++){
-
           JSONObject node = children_edges.getJSONObject(i).getJSONObject("node");
 
           if(node.has("video_url")){
@@ -124,12 +119,9 @@ public class MainActivity extends AppCompatActivity {
           }else{
             link = node.getJSONArray("display_resources").getJSONObject(2).getString("src");
             Log.i("CHILDREN_W_PHOTO_"+(i+1),node.getJSONArray("display_resources").getJSONObject(0).getString("src"));
-
-
           }
           ImageDownloader imageTask = new ImageDownloader();
           imageTask.execute(link);
-
         }
       }else{
         if(first_graphql_shortcode_media.has("video_url")){
@@ -143,14 +135,8 @@ public class MainActivity extends AppCompatActivity {
         ImageDownloader imageTask = new ImageDownloader();
         imageTask.execute(link);
       }
-
-
-      //ImageDownloader imageTask = new ImageDownloader();
-      //imageTask.execute(first_graphql_shortcode_media.getString("display_url"));
-
     }catch (Exception e){
       downloadButton.setEnabled(false);
-      //logoImageView.setImageResource(R.mipmap.ic_launcher_round);
       e.printStackTrace();
     }
   }
