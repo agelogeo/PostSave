@@ -13,9 +13,12 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -47,8 +50,21 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
+    LayoutInflater inflator = LayoutInflater.from(this);
+    View v = inflator.inflate(R.layout.bar, null);
+
     ActionBar actionBar = getSupportActionBar(); // or getActionBar();
-    getSupportActionBar().setTitle("UltimateSaver");
+      //actionBar.setTitle("UltimateSaver");
+    ActionBar.LayoutParams p = new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+    p.gravity = Gravity.CENTER;
+
+    try{
+      actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+      actionBar.setCustomView(R.layout.bar);
+
+    }catch (Exception e){
+        e.printStackTrace();
+    }
 
     downloadButton = findViewById(R.id.downloadButton);
     urlText = findViewById(R.id.urlText);

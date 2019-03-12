@@ -6,5 +6,5 @@
         android:id="@+id/instagram"
         android:icon="@drawable/ig"
         android:title="Profile"
-        app:showAsAction="ifRoom|withText"></item>
+        app:showAsAction="ifRoom"></item>
 </menu>
