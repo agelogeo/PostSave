@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -35,142 +34,9 @@ public class MainActivity extends AppCompatActivity {
   Button downloadButton;
   ImageView logoImageView;
   String link;
-  //GridLayout gridLayout;
-  //ArrayList<ImageView> image_array;
-
   GridView imageGrid;
   ArrayList<Bitmap> bitmapList;
 
-  public class ImageDownloader extends AsyncTask<String,Void, Bitmap> {
-
-    @Override
-    protected Bitmap doInBackground(String... urls) {
-      try{
-        URL url = new URL(urls[0]);
-        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-        httpURLConnection.connect();
-
-        InputStream inputStream = httpURLConnection.getInputStream();
-        Bitmap myBitmap = BitmapFactory.decodeStream(inputStream);
-
-        return myBitmap;
-
-      }catch (Exception e){
-        e.printStackTrace();
-        return null;
-      }
-    }
-
-    @Override
-    protected void onPostExecute(Bitmap bitmap) {
-        bitmapList.add(bitmap);
-        imageGrid.setAdapter(new ImageAdapter(getApplicationContext(), bitmapList));
-        /*ImageView imageView = new ImageView(getApplicationContext());
-        imageView.setImageBitmap(bitmap);
-        imageView.setMaxHeight(200);
-        imageView.setMaxWidth(200);
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        image_array.add(imageView);
-        gridLayout.addView(imageView);*/
-
-      /*ImageView imageView = new ImageView(getApplicationContext());
-      imageView.setImageBitmap(bitmap);
-      linearLayout.addView(imageView);*/
-      //logoImageView.setImageBitmap(bitmap);
-    }
-  }
-
-  public class DownloadTask extends AsyncTask<String,Void ,String>{
-
-    @Override
-    protected String doInBackground(String... urls) {
-      String result = "";
-      URL url;
-      HttpURLConnection urlConnection = null;
-
-      try{
-        url = new URL(urls[0]);
-        urlConnection = (HttpURLConnection) url.openConnection();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-        String line = null;
-        while ((line = reader.readLine()) != null)
-          result += line;
-
-        return result;
-      }catch (Exception e){
-        e.printStackTrace();
-        return null;
-      }
-    }
-
-    @Override
-    protected void onPostExecute(String s) {
-      try{
-        Pattern p2 = Pattern.compile("window._sharedData = (.*?)[}];");
-        //Log.i("TEXT",s);
-        Matcher m2 = p2.matcher(s);
-
-        m2.find();
-        String jObject = m2.group(1)+"}";
-        //Log.i("MATCHER",jObject);
-        JSONObject jsonObject = new JSONObject(jObject);
-        JSONObject entry_data = jsonObject.getJSONObject("entry_data");
-        JSONArray PostPage = entry_data.getJSONArray("PostPage");
-        JSONObject first_graphql_shortcode_media = PostPage.getJSONObject(0).getJSONObject("graphql").getJSONObject("shortcode_media");
-        JSONObject owner = first_graphql_shortcode_media.getJSONObject("owner");
-
-        Log.i("USERNAME",owner.getString("username"));
-        Log.i("PROFILE_PIC_URL",owner.getString("profile_pic_url"));
-
-
-        String link ;
-        if(first_graphql_shortcode_media.has("edge_sidecar_to_children")){
-          JSONArray children_edges = first_graphql_shortcode_media.getJSONObject("edge_sidecar_to_children").getJSONArray("edges");
-          Log.i("WITH_CHILDREN_COUNT",Integer.toString(children_edges.length()));
-
-          for(int i=0; i<children_edges.length(); i++){
-
-            JSONObject node = children_edges.getJSONObject(i).getJSONObject("node");
-
-            if(node.has("video_url")){
-              //link = node.getString("video_url");
-              link = node.getJSONArray("display_resources").getJSONObject(2).getString("src");
-              Log.i("CHILDREN_W_VIDEO_"+(i+1),node.getString("video_url"));
-            }else{
-              link = node.getJSONArray("display_resources").getJSONObject(2).getString("src");
-              Log.i("CHILDREN_W_PHOTO_"+(i+1),node.getJSONArray("display_resources").getJSONObject(0).getString("src"));
-
-
-            }
-            ImageDownloader imageTask = new ImageDownloader();
-            imageTask.execute(link);
-
-          }
-        }else{
-          if(first_graphql_shortcode_media.has("video_url")){
-            Log.i("NO_CHILDREN_W_VIDEO",first_graphql_shortcode_media.getString("video_url"));
-            //first_graphql_shortcode_media.getString("video_url");
-            link = first_graphql_shortcode_media.getJSONArray("display_resources").getJSONObject(2).getString("src");
-          }else{
-            Log.i("NO_CHILDREN_W_PHOTO",first_graphql_shortcode_media.getJSONArray("display_resources").getJSONObject(2).getString("src"));
-            link = first_graphql_shortcode_media.getJSONArray("display_resources").getJSONObject(2).getString("src");
-          }
-          ImageDownloader imageTask = new ImageDownloader();
-          imageTask.execute(link);
-        }
-
-
-        //ImageDownloader imageTask = new ImageDownloader();
-        //imageTask.execute(first_graphql_shortcode_media.getString("display_url"));
-
-      }catch (Exception e){
-        downloadButton.setEnabled(false);
-        //logoImageView.setImageResource(R.mipmap.ic_launcher_round);
-        e.printStackTrace();
-      }
-
-    }
-  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -179,11 +45,8 @@ public class MainActivity extends AppCompatActivity {
 
     downloadButton = findViewById(R.id.downloadButton);
     urlText = findViewById(R.id.urlText);
-    logoImageView = findViewById(R.id.logoImageView);
-    //gridLayout = findViewById(R.id.gridLayout);
-    //image_array = new ArrayList<ImageView>();
 
-    imageGrid = (GridView) findViewById(R.id.gridview);
+    imageGrid = findViewById(R.id.gridview);
     bitmapList = new ArrayList<Bitmap>();
 
     urlText.addTextChangedListener(new TextWatcher() {
@@ -226,6 +89,72 @@ public class MainActivity extends AppCompatActivity {
     return null;
   }
 
+  public void analyzePost(String s){
+    try{
+      Pattern p2 = Pattern.compile("window._sharedData = (.*?)[}];");
+      //Log.i("TEXT",s);
+      Matcher m2 = p2.matcher(s);
+
+      m2.find();
+      String jObject = m2.group(1)+"}";
+      //Log.i("MATCHER",jObject);
+      JSONObject jsonObject = new JSONObject(jObject);
+      JSONObject entry_data = jsonObject.getJSONObject("entry_data");
+      JSONArray PostPage = entry_data.getJSONArray("PostPage");
+      JSONObject first_graphql_shortcode_media = PostPage.getJSONObject(0).getJSONObject("graphql").getJSONObject("shortcode_media");
+      JSONObject owner = first_graphql_shortcode_media.getJSONObject("owner");
+
+      Log.i("USERNAME",owner.getString("username"));
+      Log.i("PROFILE_PIC_URL",owner.getString("profile_pic_url"));
+
+
+      String link ;
+      if(first_graphql_shortcode_media.has("edge_sidecar_to_children")){
+        JSONArray children_edges = first_graphql_shortcode_media.getJSONObject("edge_sidecar_to_children").getJSONArray("edges");
+        Log.i("WITH_CHILDREN_COUNT",Integer.toString(children_edges.length()));
+
+        for(int i=0; i<children_edges.length(); i++){
+
+          JSONObject node = children_edges.getJSONObject(i).getJSONObject("node");
+
+          if(node.has("video_url")){
+            //link = node.getString("video_url");
+            link = node.getJSONArray("display_resources").getJSONObject(2).getString("src");
+            Log.i("CHILDREN_W_VIDEO_"+(i+1),node.getString("video_url"));
+          }else{
+            link = node.getJSONArray("display_resources").getJSONObject(2).getString("src");
+            Log.i("CHILDREN_W_PHOTO_"+(i+1),node.getJSONArray("display_resources").getJSONObject(0).getString("src"));
+
+
+          }
+          ImageDownloader imageTask = new ImageDownloader();
+          imageTask.execute(link);
+
+        }
+      }else{
+        if(first_graphql_shortcode_media.has("video_url")){
+          Log.i("NO_CHILDREN_W_VIDEO",first_graphql_shortcode_media.getString("video_url"));
+          //first_graphql_shortcode_media.getString("video_url");
+          link = first_graphql_shortcode_media.getJSONArray("display_resources").getJSONObject(2).getString("src");
+        }else{
+          Log.i("NO_CHILDREN_W_PHOTO",first_graphql_shortcode_media.getJSONArray("display_resources").getJSONObject(2).getString("src"));
+          link = first_graphql_shortcode_media.getJSONArray("display_resources").getJSONObject(2).getString("src");
+        }
+        ImageDownloader imageTask = new ImageDownloader();
+        imageTask.execute(link);
+      }
+
+
+      //ImageDownloader imageTask = new ImageDownloader();
+      //imageTask.execute(first_graphql_shortcode_media.getString("display_url"));
+
+    }catch (Exception e){
+      downloadButton.setEnabled(false);
+      //logoImageView.setImageResource(R.mipmap.ic_launcher_round);
+      e.printStackTrace();
+    }
+  }
+
   public void fetchPhoto(){
     DownloadTask task = new DownloadTask();
     try {
@@ -234,4 +163,62 @@ public class MainActivity extends AppCompatActivity {
       e.printStackTrace();
     }
   }
+
+  public class DownloadTask extends AsyncTask<String,Void ,String>{
+
+    @Override
+    protected String doInBackground(String... urls) {
+      String result = "",line = null;
+      URL url;
+      HttpURLConnection urlConnection = null;
+
+      try{
+        url = new URL(urls[0]);
+        urlConnection = (HttpURLConnection) url.openConnection();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+
+        while ((line = reader.readLine()) != null)
+          result += line;
+
+        return result;
+      }catch (Exception e){
+        e.printStackTrace();
+        return null;
+      }
+    }
+
+    @Override
+    protected void onPostExecute(String s) {
+      analyzePost(s);
+    }
+  }
+
+  public class ImageDownloader extends AsyncTask<String,Void, Bitmap> {
+
+    @Override
+    protected Bitmap doInBackground(String... urls) {
+      try{
+        URL url = new URL(urls[0]);
+        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+        httpURLConnection.connect();
+
+        InputStream inputStream = httpURLConnection.getInputStream();
+        Bitmap myBitmap = BitmapFactory.decodeStream(inputStream);
+
+        return myBitmap;
+
+      }catch (Exception e){
+        e.printStackTrace();
+        return null;
+      }
+    }
+
+    @Override
+    protected void onPostExecute(Bitmap bitmap) {
+      bitmapList.add(bitmap);
+      imageGrid.setAdapter(new ImageAdapter(getApplicationContext(), bitmapList));
+
+    }
+  }
+
 }
