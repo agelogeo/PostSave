@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -70,26 +71,11 @@ public class MainActivity extends AppCompatActivity {
       try{
         url = new URL(urls[0]);
         urlConnection = (HttpURLConnection) url.openConnection();
-
-        //InputStream in = urlConnection.getInputStream();
-        //InputStreamReader reader = new InputStreamReader(in);
-
         BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
         String line = null;
         while ((line = reader.readLine()) != null)
-        {
           result += line;
-        }
-        /*int data = reader.read();
-        int limit = 0;
-        while(data != -1 ){
-          if(limit > 80000){
-            char current = (char) data;
-            result += current;
-            data = reader.read();
-          }
-          limit++;
-        }*/
+
         return result;
       }catch (Exception e){
         e.printStackTrace();
@@ -106,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
         m2.find();
         String jObject = m2.group(1);
-        Log.i("MATCHER",jObject);
+        //Log.i("MATCHER",jObject);
         JSONObject jsonObject = new JSONObject(jObject);
         JSONObject entry_data = jsonObject.getJSONObject("entry_data");
         JSONArray PostPage = entry_data.getJSONArray("PostPage");
@@ -114,18 +100,33 @@ public class MainActivity extends AppCompatActivity {
         JSONObject owner = first_graphql_shortcode_media.getJSONObject("owner");
         Log.i("USERNAME",owner.getString("username"));
 
+        if(first_graphql_shortcode_media.has("edge_sidecar_to_children")){
+          JSONArray children_edges = first_graphql_shortcode_media.getJSONObject("edge_sidecar_to_children").getJSONArray("edges");
+          Log.i("WITH_CHILDREN_COUNT",Integer.toString(children_edges.length()));
+
+          for(int i=0; i<children_edges.length(); i++){
+            JSONObject node = children_edges.getJSONObject(i).getJSONObject("node");
+
+            if(node.has("video_url")){
+              Log.i("CHILDREN_W_VIDEO_"+i,node.getString("video_url"));
+            }else{
+              Log.i("CHILDREN_W_PHOTO_"+i,node.getJSONArray("display_resources").getJSONObject(2).getString("src"));
+            }
+
+          }
+        }else{
+          if(first_graphql_shortcode_media.has("video_url")){
+            Log.i("NO_CHILDREN_W_VIDEO",first_graphql_shortcode_media.getString("video_url"));
+          }else{
+            Log.i("NO_CHILDREN_W_PHOTO",first_graphql_shortcode_media.getJSONArray("display_resources").getJSONObject(2).getString("src"));
+          }
+        }
+
+        Toast.makeText(MainActivity.this, owner.getString("username"), Toast.LENGTH_SHORT).show();
+
         ImageDownloader imageTask = new ImageDownloader();
-        imageTask.execute(owner.getString("profile_pic_url"));
+        imageTask.execute(first_graphql_shortcode_media.getString("display_url"));
 
-
-        /*ImageDownloader imageTask = new ImageDownloader();
-        Pattern p = Pattern.compile("<meta property=\"og:image\" content=\"(.*?)\"");
-        Log.i("TEXT",s);
-        Matcher m = p.matcher(s);
-
-        m.find();
-        Log.i("MATCHER",m.group(1));
-        imageTask.execute(m.group(1));*/
       }catch (Exception e){
         downloadButton.setEnabled(false);
         logoImageView.setImageResource(R.mipmap.ic_launcher_round);
