@@ -3,19 +3,24 @@ package com.agelogeo.postsave;
 import android.content.ClipDescription;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+    ActionBar actionBar = getSupportActionBar(); // or getActionBar();
+    getSupportActionBar().setTitle("UltimateSaver");
 
     downloadButton = findViewById(R.id.downloadButton);
     urlText = findViewById(R.id.urlText);
@@ -70,6 +78,30 @@ public class MainActivity extends AppCompatActivity {
           }
       }
     });
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    // Inflate the menu; this adds items to the action bar if it is present.
+    getMenuInflater().inflate(R.menu.menu_main, menu);
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    // Handle presses on the action bar items
+    switch (item.getItemId()) {
+      case R.id.instagram:
+        Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.instagram.android");
+        if (launchIntent != null) {
+          startActivity(launchIntent);//null pointer check in case package name was not found
+        }else{
+            Toast.makeText(getApplicationContext(),"Instagram is not installed.",Toast.LENGTH_SHORT).show();
+        }
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
+    }
   }
 
   public void pasteButton(View view){
@@ -118,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i("CHILDREN_W_VIDEO_"+(i+1),node.getString("video_url"));
           }else{
             link = node.getJSONArray("display_resources").getJSONObject(2).getString("src");
-            Log.i("CHILDREN_W_PHOTO_"+(i+1),node.getJSONArray("display_resources").getJSONObject(0).getString("src"));
+            Log.i("CHILDREN_W_PHOTO_"+(i+1),node.getJSONArray("display_resources").getJSONObject(2).getString("src"));
           }
           ImageDownloader imageTask = new ImageDownloader();
           imageTask.execute(link);
