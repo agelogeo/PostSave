@@ -8,14 +8,15 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -25,6 +26,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +35,11 @@ public class MainActivity extends AppCompatActivity {
   Button downloadButton;
   ImageView logoImageView;
   String link;
+  //GridLayout gridLayout;
+  //ArrayList<ImageView> image_array;
+
+  GridView imageGrid;
+  ArrayList<Bitmap> bitmapList;
 
   public class ImageDownloader extends AsyncTask<String,Void, Bitmap> {
 
@@ -56,7 +63,20 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
-      logoImageView.setImageBitmap(bitmap);
+        bitmapList.add(bitmap);
+        imageGrid.setAdapter(new ImageAdapter(getApplicationContext(), bitmapList));
+        /*ImageView imageView = new ImageView(getApplicationContext());
+        imageView.setImageBitmap(bitmap);
+        imageView.setMaxHeight(200);
+        imageView.setMaxWidth(200);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        image_array.add(imageView);
+        gridLayout.addView(imageView);*/
+
+      /*ImageView imageView = new ImageView(getApplicationContext());
+      imageView.setImageBitmap(bitmap);
+      linearLayout.addView(imageView);*/
+      //logoImageView.setImageBitmap(bitmap);
     }
   }
 
@@ -86,50 +106,66 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPostExecute(String s) {
       try{
-        Pattern p2 = Pattern.compile("window._sharedData = (.*?);");
+        Pattern p2 = Pattern.compile("window._sharedData = (.*?)[}];");
         //Log.i("TEXT",s);
         Matcher m2 = p2.matcher(s);
 
         m2.find();
-        String jObject = m2.group(1);
+        String jObject = m2.group(1)+"}";
         //Log.i("MATCHER",jObject);
         JSONObject jsonObject = new JSONObject(jObject);
         JSONObject entry_data = jsonObject.getJSONObject("entry_data");
         JSONArray PostPage = entry_data.getJSONArray("PostPage");
         JSONObject first_graphql_shortcode_media = PostPage.getJSONObject(0).getJSONObject("graphql").getJSONObject("shortcode_media");
         JSONObject owner = first_graphql_shortcode_media.getJSONObject("owner");
-        Log.i("USERNAME",owner.getString("username"));
 
+        Log.i("USERNAME",owner.getString("username"));
+        Log.i("PROFILE_PIC_URL",owner.getString("profile_pic_url"));
+
+
+        String link ;
         if(first_graphql_shortcode_media.has("edge_sidecar_to_children")){
           JSONArray children_edges = first_graphql_shortcode_media.getJSONObject("edge_sidecar_to_children").getJSONArray("edges");
           Log.i("WITH_CHILDREN_COUNT",Integer.toString(children_edges.length()));
 
           for(int i=0; i<children_edges.length(); i++){
+
             JSONObject node = children_edges.getJSONObject(i).getJSONObject("node");
 
             if(node.has("video_url")){
-              Log.i("CHILDREN_W_VIDEO_"+i,node.getString("video_url"));
+              //link = node.getString("video_url");
+              link = node.getJSONArray("display_resources").getJSONObject(2).getString("src");
+              Log.i("CHILDREN_W_VIDEO_"+(i+1),node.getString("video_url"));
             }else{
-              Log.i("CHILDREN_W_PHOTO_"+i,node.getJSONArray("display_resources").getJSONObject(2).getString("src"));
+              link = node.getJSONArray("display_resources").getJSONObject(2).getString("src");
+              Log.i("CHILDREN_W_PHOTO_"+(i+1),node.getJSONArray("display_resources").getJSONObject(0).getString("src"));
+
+
             }
+            ImageDownloader imageTask = new ImageDownloader();
+            imageTask.execute(link);
 
           }
         }else{
           if(first_graphql_shortcode_media.has("video_url")){
             Log.i("NO_CHILDREN_W_VIDEO",first_graphql_shortcode_media.getString("video_url"));
+            //first_graphql_shortcode_media.getString("video_url");
+            link = first_graphql_shortcode_media.getJSONArray("display_resources").getJSONObject(2).getString("src");
           }else{
             Log.i("NO_CHILDREN_W_PHOTO",first_graphql_shortcode_media.getJSONArray("display_resources").getJSONObject(2).getString("src"));
+            link = first_graphql_shortcode_media.getJSONArray("display_resources").getJSONObject(2).getString("src");
           }
+          ImageDownloader imageTask = new ImageDownloader();
+          imageTask.execute(link);
         }
 
-        Toast.makeText(MainActivity.this, owner.getString("username"), Toast.LENGTH_SHORT).show();
 
-        ImageDownloader imageTask = new ImageDownloader();
-        imageTask.execute(first_graphql_shortcode_media.getString("display_url"));
+        //ImageDownloader imageTask = new ImageDownloader();
+        //imageTask.execute(first_graphql_shortcode_media.getString("display_url"));
 
       }catch (Exception e){
         downloadButton.setEnabled(false);
-        logoImageView.setImageResource(R.mipmap.ic_launcher_round);
+        //logoImageView.setImageResource(R.mipmap.ic_launcher_round);
         e.printStackTrace();
       }
 
@@ -144,6 +180,11 @@ public class MainActivity extends AppCompatActivity {
     downloadButton = findViewById(R.id.downloadButton);
     urlText = findViewById(R.id.urlText);
     logoImageView = findViewById(R.id.logoImageView);
+    //gridLayout = findViewById(R.id.gridLayout);
+    //image_array = new ArrayList<ImageView>();
+
+    imageGrid = (GridView) findViewById(R.id.gridview);
+    bitmapList = new ArrayList<Bitmap>();
 
     urlText.addTextChangedListener(new TextWatcher() {
       @Override
